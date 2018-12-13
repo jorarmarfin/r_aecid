@@ -7,13 +7,11 @@ library(dplyr)
 m1<-read.csv("csv/m1_data.csv")
 m2<-read.csv("csv/m2_data.csv")
 summary(m2)
-data.dep('Piura')
+data.dep('Nacional')
 
-#Piura	***
-#Puno	***
 #Nacional	***
-  
-
+head(m1)
+head(m2)
 
 #####################################################
 t1<-subset(m2,departamento=='Amazonas' & fase=='Concluido' & estado=='published')[1]
@@ -40,16 +38,23 @@ head(d1)
 subset(d1,d1$id=='2258')
 subset(d2,d2$id=='2258')
 #####################################################
-data.dep<-function(dep,tipo){
+data.dep<-function(dep,tipo=''){
+  m2<-mutate(m2,porcentaje=porcentaje/100)
   d1<-subset(m1,Departamento==dep & Fase=='Concluido' & Estado=='Publicado')
   d2<-subset(m2,departamento==dep & fase=='Concluido' & estado=='published')
   if(tipo=='M'){
     d1<-select(d1,monto=Monto.total.español)
     d2<-select(d2,monto=monto_total_español)
   }else{
-    d1<-select(d1,id=Intervencion_Id,monto=Monto.total.español)
-    d2<-select(d2,id,monto=monto_total_español)
+    if (tipo=='P') {
+      d1<-select(d1,porcentaje=Porcentaje)
+      d2<-select(d2,porcentaje)
+    }else{
+      d1<-select(d1,id=Intervencion_Id,monto=Monto.total.español)
+      d2<-select(d2,id,monto=monto_total_español)
+    }
   }
+  
   a<-anti_join(d1,d2)
   return(a)
 }
